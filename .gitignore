@@ -1,0 +1,8 @@
+node_modules/
+.env
+generated/
+dist/
+data/*.db
+data/*.db-shm
+data/*.db-wal
+npm-debug.log*
