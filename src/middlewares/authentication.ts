@@ -19,21 +19,25 @@ export function authentication(
   response: Response,
   next: NextFunction,
 ) {
+  const authHeader = request.headers.authorization;
+  const secret = process.env.JWT_SECRET;
+
+  if (!authHeader || !secret) {
+    return response.status(401).json({ error: "Nao autenticado." });
+  }
+
+  const match = /^Bearer ([^\s]+)$/.exec(authHeader);
+  if (!match) {
+    return response.status(401).json({ error: "Nao autenticado." });
+  }
+
+  let decoded: string | jwt.JwtPayload;
   try {
-    const authHeader = request.headers.authorization;
+    decoded = jwt.verify(match[1], secret);
+  } catch {
+    return response.status(401).json({ error: "Nao autenticado." });
+  }
 
-    if (!authHeader) {
-      return response.status(401).json({ error: "Nao autenticado." });
-    }
-
-    const [bearer, token] = authHeader.split(" ");
-    const secret = process.env.JWT_SECRET;
-
-    if (bearer !== "Bearer" || !token || !secret) {
-      return response.status(401).json({ error: "Nao autenticado." });
-    }     
- 
-    const decoded = jwt.verify(token, secret);
     if (!isAuthPayload(decoded)) {
       return response.status(401).json({ error: "Nao autenticado." });
     }
@@ -44,7 +48,4 @@ export function authentication(
 
     request.body.user = decoded;
     return next();
-  } catch {
-    return response.status(401).json({ error: "Nao autenticado." });
-  }
 }

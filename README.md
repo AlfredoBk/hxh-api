@@ -16,7 +16,7 @@ npm install
 Copy-Item .env.example .env
 ```
 
-Edite `.env` e substitua `JWT_SECRET` por um valor aleatório com pelo menos 32 caracteres. Defina também o usuário e a senha que serão criados pelo seed; use essa mesma combinação nas variáveis da coleção Postman.
+Edite `.env` e substitua `JWT_SECRET` por um valor aleatório com pelo menos 32 caracteres. Defina também o usuário e a senha que serão criados pelo seed.
 
 Prepare o banco e crie o usuário:
 
@@ -67,8 +67,6 @@ Exemplo de personagem:
 }
 ```
 
-## Verificação no Postman
+## Testes e verificação
 
-Importe [`postman/Hunter-x-Hunter.postman_collection.json`](./postman/Hunter-x-Hunter.postman_collection.json) no Postman. Na coleção, ajuste `username` e `password` para os valores configurados no `.env`; `baseUrl` já está definido como `http://localhost:8080`.
-
-Com o servidor ativo e o seed executado, use **Run collection** e execute as requisições na ordem apresentada. Os testes verificam a saúde da API, login válido e inválido, rotas públicas, bloqueio sem JWT e o ciclo de criação, consulta, atualização e exclusão de um personagem. O login salva o token automaticamente para as requisições protegidas.
+Execute `npm test` para validar a saúde da API, o login, as rotas públicas, o bloqueio sem JWT e o ciclo de criação, consulta, atualização e exclusão de um personagem. Os testes usam um banco SQLite temporário e não alteram o banco de desenvolvimento.
