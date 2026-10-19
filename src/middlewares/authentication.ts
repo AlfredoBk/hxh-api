@@ -32,7 +32,7 @@ export function authentication(
     if (bearer !== "Bearer" || !token || !secret) {
       return response.status(401).json({ error: "Nao autenticado." });
     }     
-
+ 
     const decoded = jwt.verify(token, secret);
     if (!isAuthPayload(decoded)) {
       return response.status(401).json({ error: "Nao autenticado." });
