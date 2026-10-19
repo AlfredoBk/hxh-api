@@ -26,7 +26,7 @@ export function authentication(
     return response.status(401).json({ error: "Nao autenticado." });
   }
 
-  const match = /^Bearer ([^\s]+)$/.exec(authHeader);
+  const match = /^Bearer\s+(.+)$/i.exec(authHeader);
   if (!match) {
     return response.status(401).json({ error: "Nao autenticado." });
   }
@@ -38,14 +38,14 @@ export function authentication(
     return response.status(401).json({ error: "Nao autenticado." });
   }
 
-    if (!isAuthPayload(decoded)) {
-      return response.status(401).json({ error: "Nao autenticado." });
-    }
+  if (!isAuthPayload(decoded)) {
+    return response.status(401).json({ error: "Nao autenticado." });
+  }
 
-    if (!request.body || typeof request.body !== "object" || Array.isArray(request.body)) {
-      request.body = {};
-    }
+  if (!request.body || typeof request.body !== "object" || Array.isArray(request.body)) {
+    request.body = {};
+  }
 
-    request.body.user = decoded;
-    return next();
+  request.body.user = decoded;
+  return next();
 }
