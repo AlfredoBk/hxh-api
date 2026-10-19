@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
+import "dotenv/config";
 
 function isAuthPayload(value: string | jwt.JwtPayload): value is jwt.JwtPayload & {
   id: number;
@@ -18,20 +19,30 @@ export function authentication(
   response: Response,
   next: NextFunction,
 ) {
-  const authorization = request.headers.authorization;
-  const [scheme, token] = authorization?.split(" ") ?? [];
-  const secret = process.env.JWT_SECRET;
-
-  if (scheme !== "Bearer" || !token || !secret) {
-    return response.status(401).json({ error: "Nao autenticado." });
-  }
-
   try {
+    const authHeader = request.headers.authorization;
+
+    if (!authHeader) {
+      return response.status(401).json({ error: "Nao autenticado." });
+    }
+
+    const [bearer, token] = authHeader.split(" ");
+    const secret = process.env.JWT_SECRET;
+
+    if (bearer !== "Bearer" || !token || !secret) {
+      return response.status(401).json({ error: "Nao autenticado." });
+    }     
+
     const decoded = jwt.verify(token, secret);
     if (!isAuthPayload(decoded)) {
       return response.status(401).json({ error: "Nao autenticado." });
     }
-    request.user = { id: decoded.id, username: decoded.username };
+
+    if (!request.body || typeof request.body !== "object" || Array.isArray(request.body)) {
+      request.body = {};
+    }
+
+    request.body.user = decoded;
     return next();
   } catch {
     return response.status(401).json({ error: "Nao autenticado." });
